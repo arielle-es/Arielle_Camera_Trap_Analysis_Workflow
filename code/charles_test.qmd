@@ -1,13 +1,79 @@
-
 ```{r}
 
-1+1
-
-2+2
+library(dplyr)
+library(ggplot2)
 
 ```
 
-
 ```{r}
 plot(c(1,2,3),c(12,43,4))
+```
+
+```{r}
+
+super_function <- function(name1, name2) {
+    cat(name1, " is cooler than ", name1)
+}
+
+super_function("Spongebob", "Charles")
+
+```
+
+```{r}
+
+Names <- c("Spongebob", "Patrick", "Sandy")
+Age <- c(10, 18, 22)
+Height <- c(6, 8, 36)
+Color <- c("yellow", "pink", "brown")
+Shoe_size <- c(1, 14, 4)
+
+df_spongebob <- data.frame(Names = Names, Age = Age, Color_column = Color, Shoe_size = Shoe_size)
+
+df_spongebob
+
+ggplot(data = df_spongebob) +
+    geom_point(aes(x = Age, y = Height)) +
+    labs(title = "Bikini Bottom Age vs. Height")
+
+ggplot(data = df_spongebob) +
+    labs(title = "Bikini Bottom Ages") +
+    geom_col(aes(x = Names, y = Age)) 
+
+
+ggplot(data = df_spongebob) +
+    labs(title = "Bikini Bottom Ages") +
+    geom_line(aes(x = Age, y = Height)) +
+    geom_line(aes(x = Age, y = Shoe_size))
+    
+
+```
+
+```{r}
+
+ggplot(data = df_spongebob) +
+    labs(title = "Bikini Bottom Ages") +
+    geom_line(aes(x = Age, y = Shoe_size, color = "green")) +
+    geom_line(aes(x = Age, y = Height, color = "red")) 
+
+```
+
+```{r}
+
+
+ggplot(data = df_spongebob) +
+    geom_point(aes(x = Age, y = Height)) +
+    labs(title = "Bikini Bottom Age vs. Height") + 
+    facet_wrap(~Names)
+
+```
+
+```{r}
+
+df_spongebob %>%
+    ggplot() +
+    geom_point(aes(x = Age, y = Height)) +
+    labs(title = "Bikini Bottom Age vs. Height") + 
+    facet_wrap(~Names)
+
+
 ```
