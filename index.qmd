@@ -1,0 +1,21 @@
+---
+title: "Arielle Camera Trap Workflow"
+title-block-banner: true
+format:
+  html:
+    self-contained: true
+    toc: true
+    theme: sandstone
+  pdf: default
+output:
+  rmarkdown::html_document:
+    theme: sandstone
+  pagedown::pdf_document: default
+editor: visual
+author:
+  - "Arielle Escareno"
+  - "Charles Lehnen"
+lan: en
+---
+# Arielle's Camera Trap Workflow
+## A Guide To Classifying Camera Trap Images
