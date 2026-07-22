@@ -48,8 +48,32 @@ Loading in our data
 
 ```{r}
 
-dfclassifications <- read.csv(file = "output/classifications.csv")
-dfmetadata <- read.csv(file = "output/metadata/metadata.csv")
+# The working directory at render time differs depending on how/where this
+# gets knitted, so try the candidate paths in order and use the first that exists.
+read_first_existing <- function(candidates) {
+  for (path in candidates) {
+    if (file.exists(path)) {
+      return(read.csv(file = path))
+    }
+  }
+  stop("None of the candidate paths exist: ", paste(candidates, collapse = ", "))
+}
+
+dfclassifications <- read_first_existing(c(
+  "../output/classifications.csv",
+  "/output/classifications.csv",
+  "output/classifications.csv"
+))
+dfclassifications_random <- read_first_existing(c(
+  "../output/classifications_random_order.csv",
+  "/output/classifications_random_order.csv",
+  "output/classifications_random_order.csv"
+))
+dfmetadata <- read_first_existing(c(
+  "../output/metadata/metadata.csv",
+  "/output/metadata/metadata.csv",
+  "output/metadata/metadata.csv"
+))
 ```
 
 explore data
@@ -136,6 +160,42 @@ dffocal <- dfjoined %>%
   filter(species %in% c("Tortoise", "Iguana"))
 
 dffocal %>% count(species)
+```
+
+## Location data (random-order sample)
+
+`classifications.csv` is almost entirely SANTA FE 1001 (labelled in on-disk
+folder order before random ordering existed), so any comparison across camera
+locations built on it would mostly be measuring sampling order, not biology.
+Camera-location comparisons below use `classifications_random_order.csv`
+instead, via a parallel copy of the cleaning/joining steps above.
+
+```{r}
+dfclassifications_loc <- dfclassifications_random %>%
+  clean_names() %>%
+  rename_with(~ "species", ends_with("species")) %>%
+  # Skip-button rows are written as "SKIPPED" rather than blank -- exclude
+  # those along with blanks, same as the main classifications cleaning above.
+  filter(species != "", species != "SKIPPED") %>%
+  # If a crop was labelled out of the buffered folder it carries a _buf100 suffix that the metadata doesn't have. drop it so the two match.
+  mutate(crop_path = str_replace(image, "_buf\\d+(\\.[^.]+)$", "\\1")) %>%
+  mutate(crop_path = str_replace(crop_path, "^\\./", "")) %>%
+  # This file mixes rows recorded relative to output/ ("cropped/SANTA FE .../x.JPG")
+  # with rows relative to output/cropped/ ("SANTA FE .../x.JPG"); metadata's
+  # crop_path is always the latter, so normalize by dropping a leading "cropped/".
+  mutate(crop_path = str_replace(crop_path, "^cropped/", ""))
+
+dfjoined_loc <- dfclassifications_loc %>%
+  inner_join(dfmetadata_clean, by = "crop_path")
+
+# Same sanity check as the main join above -- confirm paths actually matched.
+nrow(dfclassifications_loc)
+nrow(dfjoined_loc)
+
+dffocal_loc <- dfjoined_loc %>%
+  filter(species %in% c("Tortoise", "Iguana"))
+
+dffocal_loc %>% count(species)
 ```
 
 ## Hypothesis 1: tortoises and iguanas are not in the same image
@@ -225,7 +285,7 @@ ggsave(filename = "../output/r_analysis/HourlyActivityPlot.png", width = 10, hei
 ```
 
 ```{r}
-dffocal %>%
+dffocal_loc %>%
   count(camera_trap_name, time_of_day, species) %>%
   group_by(camera_trap_name, species) %>%
   # total = all detections of that species at that camera; proportion is the
@@ -285,7 +345,7 @@ chisq.test(tod_table)
 ## Hypothesis 3: they are in different locations
 
 ```{r}
-dffocal %>%
+dffocal_loc %>%
   count(camera_trap_name, species, name = "frequency") %>%
   group_by(camera_trap_name) %>%
   mutate(proportion = frequency / sum(frequency)) %>%
@@ -307,7 +367,7 @@ ggsave(filename = "../output/r_analysis/SpeciesByCameraDonutPlot.png", width = 1
 ```
 
 ```{r}
-dffocal %>%
+dffocal_loc %>%
   count(species, camera_trap_name, name = "frequency") %>%
   ggplot(aes(y = frequency, axis1 = species, axis2 = camera_trap_name)) +
   geom_alluvium(aes(fill = species), width = 1/6) +
@@ -323,7 +383,7 @@ ggsave(filename = "../output/r_analysis/SpeciesByCameraAlluvialPlot.png", width 
 ```
 
 ```{r}
-dffocal %>%
+dffocal_loc %>%
   count(species, camera_trap_name, name = "frequency") %>%
   PieDonut(aes(species, camera_trap_name, count = frequency),
            title = "Where Each Species Was Detected",
@@ -341,7 +401,7 @@ dev.off()
 ```{r}
 # Counts as well as proportions -- a camera with 3 detections and a camera with
 # 3000 look identical once you divide, and that difference matters.
-dffocal %>%
+dffocal_loc %>%
   ggplot(aes(x = camera_trap_name, fill = species)) +
   geom_bar(position = "dodge") +
   labs(title = "Detections per Camera by Species",
@@ -354,10 +414,70 @@ ggsave(filename = "../output/r_analysis/DetectionsPerCameraPlot.png", width = 10
 
 ```{r}
 # Is species composition independent of camera?
-cam_table <- table(species = dffocal$species, camera = dffocal$camera_trap_name)
+cam_table <- table(species = dffocal_loc$species, camera = dffocal_loc$camera_trap_name)
 cam_table
 
 chisq.test(cam_table)
+```
+
+## Hypothesis 4: temporal avoidance is location-specific
+
+Hypothesis 1 showed they're rarely in the same photo, Hypothesis 2 showed
+their overall activity hours overlap, and Hypothesis 3 showed they favor
+different cameras. The open question those leave: at a camera trap both
+species actually use, do they still time-share it by shifting to different
+parts of the day -- or is one species just dominant there around the clock?
+
+A heatmap of species share per camera x time-of-day cell answers this more
+directly than a faceted bar chart would: with 5 cameras x 4 time bins x 2
+species, five separate donuts (one per camera) makes the cross-camera pattern
+hard to compare at a glance, whereas a single grid puts every camera/time
+combination in one view and highlights it with color.
+
+```{r}
+loc_time_species <- dffocal_loc %>%
+  count(camera_trap_name, time_of_day, species) %>%
+  group_by(camera_trap_name, time_of_day) %>%
+  mutate(total = sum(n), iguana_share = sum(n[species == "Iguana"]) / total) %>%
+  ungroup()
+
+loc_time_species %>%
+  distinct(camera_trap_name, time_of_day, total, iguana_share) %>%
+  ggplot(aes(x = time_of_day, y = camera_trap_name, fill = iguana_share)) +
+  geom_tile(color = "white") +
+  # Label each cell with its N so an empty or near-empty cell (e.g. a camera
+  # with one detection at 2am) doesn't read as strong evidence of anything.
+  geom_text(aes(label = paste0(round(iguana_share * 100), "%\n(n=", total, ")")),
+            size = 3, lineheight = 0.9) +
+  scale_fill_gradient2(low = "#ffcd01", mid = "white", high = "#9a0101",
+                        midpoint = 0.5, limits = c(0, 1), labels = scales::percent,
+                        name = "Iguana share") +
+  labs(title = "Species Composition by Camera and Time of Day",
+       subtitle = "Deep red = Iguana-dominated, yellow = Tortoise-dominated, white = evenly split",
+       x = "Time of day", y = "Camera trap") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+
+ggsave(filename = "../output/r_analysis/TemporalAvoidanceHeatmap.png", width = 10, height = 6, dpi = 300)
+```
+
+If the two species were splitting time-of-day within a shared camera, that
+camera's row should shift color across columns. If one species just owns that
+camera outright, the row stays a flat color regardless of time of day.
+
+```{r}
+# Per-camera test: within each camera, is species composition independent of
+# time of day? Small per-camera counts make the usual chi-square approximation
+# unreliable, so simulate the p-value instead of trusting the asymptotic one.
+dffocal_loc %>%
+  group_by(camera_trap_name) %>%
+  group_modify(~ {
+    tbl <- table(species = .x$species, time_of_day = .x$time_of_day)
+    test <- chisq.test(tbl, simulate.p.value = TRUE, B = 2000)
+    tibble(n = sum(tbl), p_value = test$p.value)
+  }) %>%
+  ungroup()
 ```
 
 Summary table
