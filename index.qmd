@@ -5,7 +5,7 @@ format:
   html:
     self-contained: true
     toc: true
-    theme: sandstone
+    theme: cyborg
   pdf: default
 output:
   rmarkdown::html_document:
@@ -192,6 +192,15 @@ ggsave(filename = "../output/r_analysis/HourlyActivityPlot.png", width = 10, hei
 
 ## Results Summary
 Out of the images I classified, tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of images. Both species were active during similar times of day, with detections peaking around midday for each, yet they tended to favor different camera trap sites overall. Together, these results suggest the two species may coexist by avoiding direct contact at a spatial scale, rather than by separating according to time of day. For my full research poster and discussion of these findings, [see here](https://postimg.cc/fkHGkFGB).
+
+## Discussion
+
+Tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of classified images.
+
+- This suggests direct co-occurrence was uncommon even though both species occupied the same general habitat.
+- Both species were detected at several of the same camera trap locations (like 976 and 983), indicating a partial overlap rather than a complete separation of habitat use. However, species did favor different camera trap sites. This outcome indicates I should reject my "Overlap hypothesis" because species displayed spatial overlap with interspecies avoidance.
+- Although tortoises and iguanas were rarely photographed together, they were active during similar times of the day. Following our analysis this is because they were present at different camera trap sites during differing time periods.
+- This suggests the two species are not avoiding each other by being active in the habitat overall at different times, so my "Avoidance hypothesis" is not supported. However, the data suggests they are avoiding one another at the site level.
 
 ## Reflections
 Overall, having the opportunity to work one on one with someone who's an expert in this field has been an amazing experience. Although I'm not necessarily interested in biological sciences, I am interested in computer science, so this project gave me hands-on skills I can directly apply to future computer science work. 
