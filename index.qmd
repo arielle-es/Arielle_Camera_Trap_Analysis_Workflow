@@ -96,6 +96,100 @@ I used R to read in my finished 'classifications.csv' file and calculate the pat
 - A heatmap showing which species was detected more often at each camera site during each time of day
 - 
 
+## Building the Figures: species_interactions.qmd
+
+All of my data analysis and figure building was done in a separate Quarto file called 'species_interactions.qmd', using R. This file reads in my finished 'classifications.csv', processes it, and generates each of the plots used in my results.
+
+Here are the figures built, along with the code used to generate each one:
+
+### Co-occurrence Bar Chart
+
+```{r}
+dfphoto_focal %>%
+  ggplot(aes(x = composition)) +
+  geom_bar(fill = "#9a0101", alpha = 0.8) +
+  labs(title = "Tortoises and Iguanas Rarely Share a Photo",
+       x = "What was in the photo", y = "Number of photos") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggsave(filename = "../output/r_analysis/CoOccurrenceBarPlot.png", width = 10, height = 8, dpi = 300)
+```
+
+![Bar chart showing how rarely tortoises and iguanas were photographed together](Imagesss/tortoises_iguanas_rare.png){width=30% fig-align="center"}
+
+### Species by Camera Trap (Alluvial Chart)
+
+```{r}
+dffocal_loc %>%
+  count(species, camera_trap_name, name = "frequency") %>%
+  ggplot(aes(y = frequency, axis1 = species, axis2 = camera_trap_name)) +
+  geom_alluvium(aes(fill = species), width = 1/6) +
+  geom_stratum(alpha = 0.5, width = 1/6) +
+  geom_text(stat = "stratum", size = 3, aes(label = after_stat(stratum))) +
+  scale_fill_manual(values = c(
+    "#9c0100",
+    "#ffcd01"
+  )) +
+  scale_x_discrete(limits = c("Species", "Camera trap"), expand = c(0.1, 0.1)) +
+  labs(title = "Which Camera Trap Each Species Was Detected",
+       y = "Number of detections", fill = "Species") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggsave(filename = "../output/r_analysis/SpeciesByCameraAlluvialPlot.png", width = 10, height = 8, dpi = 300)
+```
+
+![Chart comparing where each species was detected across camera sites](Imagesss/which_camera_trap.png){width=30% fig-align="center"}
+
+### Activity by Time of Day, by Camera
+
+```{r}
+dffocal_loc %>%
+  count(camera_trap_name, time_of_day, species) %>%
+  group_by(camera_trap_name, species) %>%
+  mutate(
+    total      = sum(n),
+    proportion = n / total,
+    se         = sqrt(proportion * (1 - proportion) / total)
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = time_of_day, y = proportion, fill = species)) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymin = pmax(proportion - se, 0), ymax = proportion + se),
+                position = position_dodge(width = 0.9), width = 0.2) +
+  scale_fill_manual(values = c("#9a0101", "#ffcd01")) +
+  labs(title = "Tortoise and Iguana Activity Peaks at Different Times of Day",
+       x = "Time of day", y = "Proportion of that species' detections",
+       fill = "Species") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  facet_wrap(~camera_trap_name)
+
+ggsave(filename = "../output/r_analysis/TimeOfDayByCameraPlot.png", width = 19, height = 8, dpi = 300)
+```
+
+![Chart comparing each species' activity levels across different times of day, broken down by camera trap site](Imagesss/peak_activity_times.png){width=30% fig-align="center"}
+
+### Hourly Detection Pattern
+
+```{r}
+dffocal %>%
+  ggplot(aes(x = hour, fill = species)) +
+  geom_histogram(binwidth = 1, position = "identity", alpha = 0.5) +
+  labs(title = "Hourly Detection Pattern by Species",
+       x = "Hour of day", y = "Number of detections", fill = "Species") +
+  scale_fill_manual(values = c("#9a0101", "#ffcd01")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggsave(filename = "../output/r_analysis/HourlyActivityPlot.png", width = 10, height = 8, dpi = 300)
+```
+
+![Chart showing the raw hourly detection pattern for each species across the day](Imagesss/hourly_detection_by_species.png){width=30% fig-align="center"}
+
+
+
 ## Results Summary
 Out of the images I classified, tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of images. Both species were active during similar times of day, with detections peaking around midday for each, yet they tended to favor different camera trap sites overall. Together, these results suggest the two species may coexist by avoiding direct contact at a spatial scale, rather than by separating according to time of day. For my full research poster and discussion of these findings, [see here](https://postimg.cc/fkHGkFGB).
 
