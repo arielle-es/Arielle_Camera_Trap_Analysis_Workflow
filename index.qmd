@@ -61,8 +61,12 @@ python3 code/capture_images.py
 
 ## Step 3: Manual Classification
 A GUI (Graphical User Interface) is a visual way to interact with a program. Instead of writing code, you click or tap buttons. The image classification tool I used was built by Charles Lehnen: [view his repository here](https://github.com/CharlesLehnen/camera_trap_analysis).
+![Image Classification GUI](Imagesss/image_class.png)
+The fields I classified for each image were: Species, Behavior, Shade, Plant, Part, Location, and Iguana_and_tortoise_present (True/False). 
 
-The fields I classified for each image were: Species, Behavior, Shade, Plant, Part, Location, and Iguana_and_tortoise_present (True/False). The GUI lets you classify using either keyboard shortcuts (faster, once you know the categories) or dropdown/radio buttons (slower, but more visual).
+![My classifications viewed as a text file](Imagesss/classificationss.png)
+
+The GUI lets you classify using either keyboard shortcuts (faster, once you know the categories) or dropdown/radio buttons (slower, but more visual).
 
 ```bash
 python3 code/image_classification.py
