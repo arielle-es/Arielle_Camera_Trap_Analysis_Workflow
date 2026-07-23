@@ -26,11 +26,16 @@ rm(list = ls())
 ```{r}
 
 library(readr) 
+# read in our data
 library(dplyr)
+# for reshaping data for analysis
 library(ggplot2)
+# for plots
 library(janitor)
+# cleaning the data, specifically column names
 library(stringr)
-library(lubridate)
+# helps us work with strings and characters
+library(lubridate) # for working with dates and times
 library(ggalluvial) # for the alluvial plot
 library(webr) # for the stacked donut plot
 
