@@ -32,6 +32,18 @@ This project investigates whether Galápagos tortoises and iguanas share overlap
 - R (for data analysis and figures)
 - Markdown
 
+## Learning GitHub and Markdown
+
+Before starting the actual research project, my mentor introduced me to GitHub and Markdown on my first day. GitHub is a platform used to store code and track changes on a project over time, and Markdown is a simple formatting language used to write styled text that is then converted into HTML. To practice, I created a test README file written in Markdown which was themed around SpongeBob just to get comfortable with the syntax before using it on anything that mattered for my actual research. I used a cheat sheet located on Charles Lehnen's website.
+This first day is also where I learned the core Git vocabulary I'd use throughout the rest of the project:
+
+- **Commit** – saving your changes, along with a short message describing what you changed
+- **Push** – sending your committed changes up to GitHub, so they're saved online 
+- **Pull** – downloading any new changes from GitHub down to your own computer
+- **Fetch** – checking GitHub for new changes 
+Learning these basics early made the rest of the project much smoother, since I already understood how to save and track my work before I started making classifications.
+
+
 ## Step 1: Setting Up the Environment
 I had to download an IDE (Integrated Development Environment) to write and run my code, so I used Positron. IDEs are what coders use to write, test, and debug code. Other IDEs include RStudio, which is built specifically to run R code. Positron, on the other hand, was built to support both R and Python from the ground up, and since it's a fork of VS Code, it can be made to run many other languages too.
 
@@ -88,3 +100,6 @@ I used R to read in my finished 'classifications.csv' file and calculate the pat
 Out of the images I classified, tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of images. Both species were active during similar times of day, with detections peaking around midday for each, yet they tended to favor different camera trap sites overall. Together, these results suggest the two species may coexist by avoiding direct contact at a spatial scale, rather than by separating according to time of day. For my full research poster and discussion of these findings, [see here](https://postimg.cc/fkHGkFGB).
 
 ## Reflections
+Overall, having the opportunity to work one on one with someone who's an expert in this field has been an amazing experience. Although I'm not necessarily interested in biological sciences, I am interested in computer science, so this project gave me hands-on skills I can directly apply to future computer science work. 
+Beyond the bigger technical skills, I picked up a lot of small, practical tricks along the way that made me faster and more comfortable working in the terminal. Using the up arrow to re-run a command I'd already typed instead of retyping it saved some time. I also learned the importance of committing my changes regularly as I worked, so that my progress was always saved and recoverable.
+I also learned firsthand how research doesn't always go the way you expect. My original hypotheses predicted either full habitat overlap or a clear pattern of time-based avoidance between species, but my actual data showed something more nuanced than either option, which pushed me to think more carefully about what my results really meant instead of forcing them into a simple yes or no conclusion. 
