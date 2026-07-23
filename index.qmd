@@ -24,6 +24,16 @@ lan: en
 ## Project Overview
 This project investigates whether Galápagos tortoises and iguanas share overlapping habitat on Santa Fé Island, or actively avoid direct competition with one another. Using five Reconyx Hyperfire 2 camera traps placed across the island from July 2023 to May 2025, I classified hundreds of camera trap images to examine when and where each species was detected. Raw images were processed using an automated detection model (MegaDetector) to identify which images contained animals, and were then manually classified using a custom Python-based tool built by my mentor, Charles Lehnen. My findings suggest that while tortoises and iguanas were rarely photographed together and tended to favor different camera trap sites, both species were active during similar times of day, pointing to spatial rather than temporal avoidance between the two species. This site walks through the full technical process behind my analysis, from setting up the environment to building the final figures.
 
+## Background
+
+Santa Fé Island is a small, remote island in the Galápagos Archipelago of Ecuador.
+
+- The Galápagos Islands are home to the endemic Galápagos iguana and Galápagos tortoise.
+- The Santa Fé tortoise species went extinct in the mid-1800s, largely due to hunting by sailors and whalers passing through the islands at the time. Because no genetic sample of the original species survived, a closely related tortoise species was introduced to the island starting in 2015 to help restore its ecological balance.
+- The Galápagos land iguana, meanwhile, remained on the island throughout this time and was never displaced.
+- Because these species share the same environment, there may be spatial overlap or active avoidance between them.
+
+
 ## Tools Used
 - Positron (IDE)
 - Python 3.11
