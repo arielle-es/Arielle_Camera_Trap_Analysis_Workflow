@@ -104,7 +104,7 @@ Here are the figures built, along with the code used to generate each one:
 
 ### Co-occurrence Bar Chart
 
-```{r}
+```r
 dfphoto_focal %>%
   ggplot(aes(x = composition)) +
   geom_bar(fill = "#9a0101", alpha = 0.8) +
@@ -120,7 +120,7 @@ ggsave(filename = "../output/r_analysis/CoOccurrenceBarPlot.png", width = 10, he
 
 ### Species by Camera Trap (Alluvial Chart)
 
-```{r}
+```r
 dffocal_loc %>%
   count(species, camera_trap_name, name = "frequency") %>%
   ggplot(aes(y = frequency, axis1 = species, axis2 = camera_trap_name)) +
@@ -144,7 +144,7 @@ ggsave(filename = "../output/r_analysis/SpeciesByCameraAlluvialPlot.png", width 
 
 ### Activity by Time of Day, by Camera
 
-```{r}
+```r
 dffocal_loc %>%
   count(camera_trap_name, time_of_day, species) %>%
   group_by(camera_trap_name, species) %>%
@@ -173,7 +173,7 @@ ggsave(filename = "../output/r_analysis/TimeOfDayByCameraPlot.png", width = 19, 
 
 ### Hourly Detection Pattern
 
-```{r}
+```r
 dffocal %>%
   ggplot(aes(x = hour, fill = species)) +
   geom_histogram(binwidth = 1, position = "identity", alpha = 0.5) +
