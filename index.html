@@ -22,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -2200,6 +2235,15 @@ vertical-align: -.125em;
   <li><a href="#arielles-camera-trap-workflow" id="toc-arielles-camera-trap-workflow" class="nav-link active" data-scroll-target="#arielles-camera-trap-workflow">Arielle’s Camera Trap Workflow</a>
   <ul class="collapse">
   <li><a href="#a-guide-to-classifying-camera-trap-images" id="toc-a-guide-to-classifying-camera-trap-images" class="nav-link" data-scroll-target="#a-guide-to-classifying-camera-trap-images">A Guide To Classifying Camera Trap Images</a></li>
+  <li><a href="#project-overview" id="toc-project-overview" class="nav-link" data-scroll-target="#project-overview">Project Overview</a></li>
+  <li><a href="#tools-used" id="toc-tools-used" class="nav-link" data-scroll-target="#tools-used">Tools Used</a></li>
+  <li><a href="#step-1-setting-up-the-environment" id="toc-step-1-setting-up-the-environment" class="nav-link" data-scroll-target="#step-1-setting-up-the-environment">Step 1: Setting Up the Environment</a></li>
+  <li><a href="#step-2-running-unsupervised-detection" id="toc-step-2-running-unsupervised-detection" class="nav-link" data-scroll-target="#step-2-running-unsupervised-detection">Step 2: Running Unsupervised Detection</a></li>
+  <li><a href="#step-3-manual-classification" id="toc-step-3-manual-classification" class="nav-link" data-scroll-target="#step-3-manual-classification">Step 3: Manual Classification</a></li>
+  <li><a href="#step-4-extracting-site-and-time-of-day-data" id="toc-step-4-extracting-site-and-time-of-day-data" class="nav-link" data-scroll-target="#step-4-extracting-site-and-time-of-day-data">Step 4: Extracting Site and Time-of-Day Data</a></li>
+  <li><a href="#step-5-analyzing-the-data-in-r" id="toc-step-5-analyzing-the-data-in-r" class="nav-link" data-scroll-target="#step-5-analyzing-the-data-in-r">Step 5: Analyzing the Data in R</a></li>
+  <li><a href="#results-summary" id="toc-results-summary" class="nav-link" data-scroll-target="#results-summary">Results Summary</a></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections">Reflections</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
@@ -2214,6 +2258,72 @@ vertical-align: -.125em;
 <h1>Arielle’s Camera Trap Workflow</h1>
 <section id="a-guide-to-classifying-camera-trap-images" class="level2">
 <h2 class="anchored" data-anchor-id="a-guide-to-classifying-camera-trap-images">A Guide To Classifying Camera Trap Images</h2>
+</section>
+<section id="project-overview" class="level2">
+<h2 class="anchored" data-anchor-id="project-overview">Project Overview</h2>
+<p>This project investigates whether Galápagos tortoises and iguanas share overlapping habitat on Santa Fé Island, or actively avoid direct competition with one another. Using five Reconyx Hyperfire 2 camera traps placed across the island from July 2023 to May 2025, I classified hundreds of camera trap images to examine when and where each species was detected. Raw images were processed using an automated detection model (MegaDetector) to identify which images contained animals, and were then manually classified using a custom Python-based tool built by my mentor, Charles Lehnen. My findings suggest that while tortoises and iguanas were rarely photographed together and tended to favor different camera trap sites, both species were active during similar times of day, pointing to spatial rather than temporal avoidance between the two species. This site walks through the full technical process behind my analysis, from setting up the environment to building the final figures.</p>
+</section>
+<section id="tools-used" class="level2">
+<h2 class="anchored" data-anchor-id="tools-used">Tools Used</h2>
+<ul>
+<li>Positron (IDE)</li>
+<li>Python 3.11</li>
+<li>GitHub / GitHub Desktop</li>
+<li>MegaDetector (AI detection model)</li>
+<li>R (for data analysis and figures)</li>
+<li>Markdown</li>
+</ul>
+</section>
+<section id="step-1-setting-up-the-environment" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-setting-up-the-environment">Step 1: Setting Up the Environment</h2>
+<p>I had to download an IDE (Integrated Development Environment) to write and run my code, so I used Positron. IDEs are what coders use to write, test, and debug code. Other IDEs include RStudio, which is built specifically to run R code. Positron, on the other hand, was built to support both R and Python from the ground up, and since it’s a fork of VS Code, it can be made to run many other languages too.</p>
+<ul>
+<li>In order to run the classification GUI tool Charles built, I needed Python installed on my computer. Since my MacBook is from early 2015, I had to install an older, compatible version of Python using my Mac terminal.</li>
+<li>I also had to set up a virtual environment (venv). A venv is like a boxed-up workspace that only contains a specific Python version and its dependencies, kept separate from anything else installed on the computer. I created mine using the terminal:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3.11</span> <span class="at">-m</span> venv venv</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> venv/bin/activate</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>After that, I installed all the required dependencies (external code libraries the project needed) so Python could actually run the tool:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="step-2-running-unsupervised-detection" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-running-unsupervised-detection">Step 2: Running Unsupervised Detection</h2>
+<ul>
+<li>MegaDetector is an open-source AI tool used to detect animals, humans, and vehicles in camera trap images. It scans through thousands of photos and filters out the blank ones automatically. MegaDetector assigns a confidence score to each detection, and the user chooses how confident the AI needs to be before counting something as a real detection. In my case, I was looking specifically for animals.</li>
+<li>Running ‘capture_images.py’ starts this process automatically across all your images:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> code/capture_images.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>This produces outputs: bounding box images, cropped images (close ups of just the animals), and a ‘metadata.csv’ file summarizing details like date, time, and camera location for each detection.</li>
+</ul>
+</section>
+<section id="step-3-manual-classification" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-manual-classification">Step 3: Manual Classification</h2>
+<p>A GUI (Graphical User Interface) is a visual way to interact with a program. Instead of writing code, you click or tap buttons. The image classification tool I used was built by Charles Lehnen: <a href="https://github.com/CharlesLehnen/camera_trap_analysis">view his repository here</a>.</p>
+<p>The fields I classified for each image were: Species, Behavior, Shade, Plant, Part, Location, and Iguana_and_tortoise_present (True/False). The GUI lets you classify using either keyboard shortcuts (faster, once you know the categories) or dropdown/radio buttons (slower, but more visual).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> code/image_classification.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="step-4-extracting-site-and-time-of-day-data" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-extracting-site-and-time-of-day-data">Step 4: Extracting Site and Time-of-Day Data</h2>
+<p>Rather than manually recording which camera took each photo or what time of day it was taken, this information was pulled directly from each image’s existing metadata.</p>
+</section>
+<section id="step-5-analyzing-the-data-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-analyzing-the-data-in-r">Step 5: Analyzing the Data in R</h2>
+<p>I used R to read in my finished ‘classifications.csv’ file and calculate the patterns behind my results: how often each species appeared together, how their detections were distributed across camera sites, and how their activity compared across different times of day. Using the <code>ggplot2</code> package, four main figures were built from this data:</p>
+<ul>
+<li>A bar chart showing how rarely tortoises and iguanas were photographed together</li>
+<li>A chart comparing where each species was detected across camera sites</li>
+<li>A chart comparing each species’ activity levels across different times of day</li>
+<li>A heatmap showing which species was detected more often at each camera site during each time of day</li>
+<li></li>
+</ul>
+</section>
+<section id="results-summary" class="level2">
+<h2 class="anchored" data-anchor-id="results-summary">Results Summary</h2>
+<p>Out of the images I classified, tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of images. Both species were active during similar times of day, with detections peaking around midday for each, yet they tended to favor different camera trap sites overall. Together, these results suggest the two species may coexist by avoiding direct contact at a spatial scale, rather than by separating according to time of day. For my full research poster and discussion of these findings, <a href="https://postimg.cc/fkHGkFGB">see here</a>.</p>
+</section>
+<section id="reflections" class="level2">
+<h2 class="anchored" data-anchor-id="reflections">Reflections</h2>
 </section>
 </section>
 

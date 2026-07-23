@@ -17,5 +17,70 @@ author:
   - "Charles Lehnen"
 lan: en
 ---
+
 # Arielle's Camera Trap Workflow
 ## A Guide To Classifying Camera Trap Images
+
+## Project Overview
+This project investigates whether Galápagos tortoises and iguanas share overlapping habitat on Santa Fé Island, or actively avoid direct competition with one another. Using five Reconyx Hyperfire 2 camera traps placed across the island from July 2023 to May 2025, I classified hundreds of camera trap images to examine when and where each species was detected. Raw images were processed using an automated detection model (MegaDetector) to identify which images contained animals, and were then manually classified using a custom Python-based tool built by my mentor, Charles Lehnen. My findings suggest that while tortoises and iguanas were rarely photographed together and tended to favor different camera trap sites, both species were active during similar times of day, pointing to spatial rather than temporal avoidance between the two species. This site walks through the full technical process behind my analysis, from setting up the environment to building the final figures.
+
+## Tools Used
+- Positron (IDE)
+- Python 3.11
+- GitHub / GitHub Desktop
+- MegaDetector (AI detection model)
+- R (for data analysis and figures)
+- Markdown
+
+## Step 1: Setting Up the Environment
+I had to download an IDE (Integrated Development Environment) to write and run my code, so I used Positron. IDEs are what coders use to write, test, and debug code. Other IDEs include RStudio, which is built specifically to run R code. Positron, on the other hand, was built to support both R and Python from the ground up, and since it's a fork of VS Code, it can be made to run many other languages too.
+
+- In order to run the classification GUI tool Charles built, I needed Python installed on my computer. Since my MacBook is from early 2015, I had to install an older, compatible version of Python using my Mac terminal.
+- I also had to set up a virtual environment (venv). A venv is like a boxed-up workspace that only contains a specific Python version and its dependencies, kept separate from anything else installed on the computer. I created mine using the terminal:
+
+```bash
+python3.11 -m venv venv
+source venv/bin/activate
+```
+
+After that, I installed all the required dependencies (external code libraries the project needed) so Python could actually run the tool:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Step 2: Running Unsupervised Detection
+- MegaDetector is an open-source AI tool used to detect animals, humans, and vehicles in camera trap images. It scans through thousands of photos and filters out the blank ones automatically. MegaDetector assigns a confidence score to each detection, and the user chooses how confident the AI needs to be before counting something as a real detection. In my case, I was looking specifically for animals.
+- Running ‘capture_images.py’ starts this process automatically across all your images:
+
+```bash
+python3 code/capture_images.py
+```
+
+- This produces outputs: bounding box images, cropped images (close ups of just the animals), and a ‘metadata.csv’ file summarizing details like date, time, and camera location for each detection.
+
+## Step 3: Manual Classification
+A GUI (Graphical User Interface) is a visual way to interact with a program. Instead of writing code, you click or tap buttons. The image classification tool I used was built by Charles Lehnen: [view his repository here](https://github.com/CharlesLehnen/camera_trap_analysis).
+
+The fields I classified for each image were: Species, Behavior, Shade, Plant, Part, Location, and Iguana_and_tortoise_present (True/False). The GUI lets you classify using either keyboard shortcuts (faster, once you know the categories) or dropdown/radio buttons (slower, but more visual).
+
+```bash
+python3 code/image_classification.py
+```
+
+## Step 4: Extracting Site and Time-of-Day Data
+Rather than manually recording which camera took each photo or what time of day it was taken, this information was pulled directly from each image's existing metadata. 
+
+## Step 5: Analyzing the Data in R
+I used R to read in my finished 'classifications.csv' file and calculate the patterns behind my results: how often each species appeared together, how their detections were distributed across camera sites, and how their activity compared across different times of day. Using the `ggplot2` package, four main figures were built from this data:
+
+- A bar chart showing how rarely tortoises and iguanas were photographed together
+- A chart comparing where each species was detected across camera sites
+- A chart comparing each species' activity levels across different times of day
+- A heatmap showing which species was detected more often at each camera site during each time of day
+- 
+
+## Results Summary
+Out of the images I classified, tortoises and iguanas were rarely photographed together, appearing in the same frame in less than 1% of images. Both species were active during similar times of day, with detections peaking around midday for each, yet they tended to favor different camera trap sites overall. Together, these results suggest the two species may coexist by avoiding direct contact at a spatial scale, rather than by separating according to time of day. For my full research poster and discussion of these findings, [see here](https://postimg.cc/fkHGkFGB).
+
+## Reflections
