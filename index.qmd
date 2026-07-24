@@ -1,5 +1,5 @@
 ---
-title: "Arielle Camera Trap Workflow"
+title: "Arielle's Camera Trap Classification Workflow"
 title-block-banner: true
 format:
   html:
@@ -74,6 +74,14 @@ pip install -r requirements.txt
 ## Step 2: Running Unsupervised Detection
 - MegaDetector is an open-source AI tool used to detect animals, humans, and vehicles in camera trap images. It scans through thousands of photos and filters out the blank ones automatically. MegaDetector assigns a confidence score to each detection, and the user chooses how confident the AI needs to be before counting something as a real detection. In my case, I was looking specifically for animals.
 - Running ‘capture_images.py’ starts this process automatically across all your images:
+
+### Example Outputs: Bounding Boxes and Cropped Images
+
+Here are examples of what this detection step actually produces; a raw camera trap image with a bounding box drawn around a detected animal, and the resulting cropped image used later for manual classification:
+
+![A raw camera trap image of an iguana with a bounding box drawn around a detected animal](Imagesss/RCNX0017.JPG){width=50% fig-align="center"}
+
+![The same detection cropped into an individual image, ready for manual classification](Imagesss/RCNX0017_crop1.JPG){width=50% fig-align="center"}
 
 ```bash
 python3 code/capture_images.py
@@ -217,7 +225,7 @@ Overall, having the opportunity to work one on one with someone who's an expert 
 Beyond the bigger technical skills, I picked up a lot of small, practical tricks along the way that made me faster and more comfortable working in the terminal. Using the up arrow to re-run a command I'd already typed instead of retyping it saved some time. I also learned the importance of committing my changes regularly as I worked, so that my progress was always saved and recoverable.
 I also learned firsthand how research doesn't always go the way you expect. My original hypotheses predicted either full habitat overlap or a clear pattern of time-based avoidance between species, but my actual data showed something more nuanced than either option, which pushed me to think more carefully about what my results really meant instead of forcing them into a simple yes or no conclusion. 
 ## Acknowledgments
-I would like to thank my mentor, Charles Lehnen, for being there for me throughout my research. He taught me a lot of tips and tricks along the way that gave me a real introduction to computer science. Thank you to the USC Young Researchers Program for making this opportunity possible.
+I would like to thank my mentor, Charles Lehnen, for being a very helpful guide throughout my research. He taught me a lot of tips and tricks along the way that gave me a real introduction to computer science. Thank you to the USC Young Researchers Program for making this opportunity possible.
 
 ## References
 Lehnen, C. (2025). *Camera Trap Labeling Tool* [Computer software].
