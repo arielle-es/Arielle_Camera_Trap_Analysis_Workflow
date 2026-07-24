@@ -28,6 +28,10 @@ This project investigates whether Galápagos tortoises and iguanas share overlap
 
 Santa Fé Island is a small, remote island in the Galápagos Archipelago of Ecuador.
 
+![](Imagesss/paste2.png){fig-align="center" width="745"}
+
+
+
 - The Galápagos Islands are home to the endemic Galápagos iguana and Galápagos tortoise.
 - The Santa Fé tortoise species went extinct in the mid-1800s, largely due to hunting by sailors and whalers passing through the islands at the time. Because no genetic sample of the original species survived, a closely related tortoise species was introduced to the island starting in 2015 to help restore its ecological balance.
 - The Galápagos land iguana, meanwhile, remained on the island throughout this time and was never displaced.
@@ -120,6 +124,154 @@ All of my data analysis and figure building was done in a separate Quarto file c
 
 Here are the figures built, along with the code used to generate each one:
 
+### Clearing environment to have a clean slate
+
+```{r}
+
+rm(list = ls())
+
+```
+
+### Loading in the packages we need
+
+```{r}
+#| output: false
+
+library(readr) 
+library(dplyr)
+library(ggplot2)
+library(janitor)
+library(stringr)
+library(lubridate)
+library(ggalluvial) # for the alluvial plot
+library(webr) # for the stacked donut plot
+
+
+```
+
+### Setting output folder for my plots
+
+```{r}
+
+# Output folder
+dir.create("../output/r_analysis", showWarnings = FALSE, recursive = TRUE)
+
+```
+
+### Loading in our data
+
+```{r}
+
+# Dealing with different OSs 
+read_first_existing <- function(candidates) {
+  for (path in candidates) {
+    if (file.exists(path)) {
+      return(read.csv(file = path))
+    }
+  }
+  stop("None of the candidate paths exist: ", paste(candidates, collapse = ", "))
+}
+
+dfclassifications <- read_first_existing(c(
+  "../output/classifications.csv",
+  "/output/classifications.csv",
+  "output/classifications.csv"
+))
+dfclassifications_random <- read_first_existing(c(
+  "../output/classifications_random_order.csv",
+  "/output/classifications_random_order.csv",
+  "output/classifications_random_order.csv"
+))
+dfmetadata <- read_first_existing(c(
+  "../output/metadata/metadata.csv",
+  "/output/metadata/metadata.csv",
+  "output/metadata/metadata.csv"
+))
+```
+
+### Exploring our data
+
+```{r}
+
+head(dfclassifications)
+
+```
+
+```{r}
+
+summary(dfclassifications)
+
+```
+
+```{r}
+
+str(dfclassifications)
+
+```
+
+### Cleaning our data
+
+```{r}
+dfclassifications_clean <- dfclassifications %>%
+  clean_names() %>%
+  rename_with(~ "species", ends_with("species")) %>%
+  filter(species != "") %>%
+  # If a crop was labelled out of the buffered folder it carries a _buf100 suffix that the metadata doesn't have. drop it so the two match.
+  mutate(crop_path = str_replace(image, "_buf\\d+(\\.[^.]+)$", "\\1")) %>%
+  mutate(crop_path = str_replace(crop_path, "^\\./", ""))
+
+dfmetadata_clean <- dfmetadata %>%
+  clean_names() %>%
+
+  # get column name formats to match
+  mutate(crop_path = str_remove(cropped_image, "^.*output/cropped/")) %>%
+  mutate(
+    first_seg = str_replace(subfolder, "[/\\\\].*$", ""), 
+    cam_id    = str_extract(first_seg, "\\d{3,}"),
+    camera_trap_name = if_else(is.na(cam_id), "000", cam_id)
+  ) %>%
+  
+  mutate(
+    dt   = parse_date_time(date_time_original, orders = "Y:m:d H:M:S"),
+    date = as_date(dt),
+    hour = hour(dt)
+  ) %>%
+
+  # Santa Fe sits on the equator, so daylight is roughly 06:00-18:00 year round
+  mutate(time_of_day = case_when(
+    hour >= 6  & hour < 11 ~ "Morning",
+    hour >= 11 & hour < 15 ~ "Midday",
+    hour >= 15 & hour < 18 ~ "Afternoon",
+    TRUE ~ "Night"
+  )) %>%
+  mutate(time_of_day = factor(time_of_day,
+                              levels = c("Morning", "Midday", "Afternoon", "Night"))) %>%
+  # select only the columns we need
+  select(subfolder, original_image, crop_path, camera_trap_name,
+         dt, date, hour, time_of_day, confidence)
+
+
+summary(dfmetadata_clean)
+```
+
+
+### Joining my data with the metadaa
+
+```{r}
+# inner_join because a crop is only useful here if we both detected AND labelled it.
+dfjoined <- dfclassifications_clean %>%
+  inner_join(dfmetadata_clean, by = "crop_path")
+
+# Just our two focal species
+dffocal <- dfjoined %>%
+  filter(species %in% c("Tortoise", "Iguana"))
+
+nrow(dfclassifications_clean)
+nrow(dfjoined)
+
+```
+
+
 ### Co-occurrence Bar Chart
 
 ```r
@@ -136,7 +288,8 @@ ggsave(filename = "../output/r_analysis/CoOccurrenceBarPlot.png", width = 10, he
 
 ![Bar chart showing how rarely tortoises and iguanas were photographed together](Imagesss/tortoises_iguanas_rare.png){width=30% fig-align="center"}
 
-### Species by Camera Trap (Alluvial Chart)
+## Species by Camera Trap (Alluvial Chart)
+
 
 ```r
 dffocal_loc %>%
